@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HBCU Digital Equity Dashboard</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+  <!-- Dashboard CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar">
+
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="8" fill="#845ec2"/>
+          <path d="M8 28 L14 14 L20 22 L26 12 L32 28" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="14" cy="14" r="2.5" fill="#b39ddb"/>
+          <circle cx="20" cy="22" r="2.5" fill="#b39ddb"/>
+          <circle cx="26" cy="12" r="2.5" fill="#b39ddb"/>
+          <rect x="8" y="30" width="24" height="2" rx="1" fill="#b39ddb" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="sidebar-header-text">
+        <h1>HBCU Digital Equity Dashboard</h1>
+        <div class="subtitle">HBCU Library Alliance | 103 Member Schools</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <label>Color Map By</label>
+        <select id="metric-select"></select>
+      </div>
+      <div class="control-group">
+        <label>Filter by State</label>
+        <select id="state-select">
+          <option value="all">All States</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Search School</label>
+        <input type="text" id="search-input" placeholder="Type school name or city..." />
+      </div>
+      <div class="control-group">
+        <label>Show Bottom Percentile</label>
+        <div class="range-wrapper">
+          <input type="range" id="threshold-slider" min="0" max="100" value="0" />
+          <span class="range-value" id="threshold-value">0%</span>
+        </div>
+      </div>
+      <div class="control-group" style="text-align:right">
+        <button id="reset-btn" style="padding:6px 16px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;cursor:pointer;font-size:12px;">Reset Filters</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-summary">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-income">--</div>
+        <div class="stat-label">Avg Income</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-broadband">--</div>
+        <div class="stat-label">Avg Broadband</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-education">--</div>
+        <div class="stat-label">Avg Bachelor's+</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-hs">--</div>
+        <div class="stat-label">Avg HS Completion</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-uninsured">--</div>
+        <div class="stat-label">Avg Uninsured</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-poverty">--</div>
+        <div class="stat-label">Avg Poverty</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-employment">--</div>
+        <div class="stat-label">Avg Employment</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-schools">Schools</button>
+      <button class="tab-btn" data-tab="tab-detail">Detail</button>
+      <button class="tab-btn" data-tab="tab-charts">By State</button>
+    </div>
+
+    <div class="tab-content">
+
+      <!-- Schools List -->
+      <div class="tab-panel active" id="tab-schools">
+        <ul class="school-list" id="school-list"></ul>
+      </div>
+
+      <!-- Detail Panel -->
+      <div class="tab-panel" id="tab-detail">
+        <div class="detail-panel visible" id="detail-panel">
+          <div class="detail-header">
+            <div>
+              <h3 id="detail-name">Select a school</h3>
+              <div class="detail-location" id="detail-location">Click a marker or school name</div>
+            </div>
+            <button class="close-detail" onclick="closeDetail()">&times;</button>
+          </div>
+          <div class="metric-bars" id="metric-bars"></div>
+          <div class="radar-container">
+            <h4>Profile vs HBCU Average</h4>
+            <canvas id="radar-chart" width="300" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- State Charts -->
+      <div class="tab-panel" id="tab-charts">
+        <div class="chart-container" style="height:500px">
+          <h4>State Averages (Selected Metric)</h4>
+          <canvas id="state-bar-chart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="map">Map View</button>
+        <button class="view-btn" data-view="compare">State Comparison</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="school-count" id="school-count">
+          Showing <strong>103</strong> of <strong>103</strong> schools
+        </div>
+        <button id="export-btn" class="export-btn">Export Fact Sheet</button>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Comparison View -->
+    <div class="comparison-view" id="comparison-view">
+      <div class="comparison-grid">
+        <div class="comparison-chart-card">
+          <h3>Median Household Income by State</h3>
+          <div style="height:300px"><canvas id="comp-income-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card">
+          <h3>Broadband Access by State</h3>
+          <div style="height:300px"><canvas id="comp-broadband-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card">
+          <h3>Educational Attainment by State</h3>
+          <div style="height:300px"><canvas id="comp-education-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card">
+          <h3>Uninsured Rate by State</h3>
+          <div style="height:300px"><canvas id="comp-health-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card">
+          <h3>Poverty Rate by State</h3>
+          <div style="height:300px"><canvas id="comp-poverty-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card">
+          <h3>HS Completion Rate by State</h3>
+          <div style="height:300px"><canvas id="comp-hs-chart"></canvas></div>
+        </div>
+        <div class="comparison-chart-card full-width">
+          <h3>Employment Rate by State</h3>
+          <div style="height:300px"><canvas id="comp-employment-chart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== Scripts ===== -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/map.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
