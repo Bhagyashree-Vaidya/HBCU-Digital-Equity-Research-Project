@@ -29,23 +29,7 @@ const HBCUMap = (() => {
       maxZoom: 18
     }).addTo(map);
 
-    markersLayer = L.markerClusterGroup({
-      maxClusterRadius: 35,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      iconCreateFunction: function (cluster) {
-        const count = cluster.getChildCount();
-        let size = 'small';
-        if (count > 20) size = 'large';
-        else if (count > 5) size = 'medium';
-        return L.divIcon({
-          html: '<div></div>',
-          className: 'marker-cluster marker-cluster-' + size,
-          iconSize: L.point(40, 40)
-        });
-      }
-    }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
     radiusLayer = L.layerGroup().addTo(map);
 
     addLegend();
