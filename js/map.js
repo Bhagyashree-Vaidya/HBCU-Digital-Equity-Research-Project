@@ -40,7 +40,7 @@ const HBCUMap = (() => {
         if (count > 20) size = 'large';
         else if (count > 5) size = 'medium';
         return L.divIcon({
-          html: '<div><span>' + count + '</span></div>',
+          html: '<div></div>',
           className: 'marker-cluster marker-cluster-' + size,
           iconSize: L.point(40, 40)
         });
