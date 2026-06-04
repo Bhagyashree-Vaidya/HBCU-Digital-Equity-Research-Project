@@ -16,6 +16,7 @@ const App = (() => {
     setupTabs();
     setupViewToggle();
     setupCompare();
+    setupStatsToggle();
 
     refresh();
     updateStats(HBCUData.getSchools());
@@ -303,6 +304,18 @@ const App = (() => {
   function updateSchoolCount(shown, total) {
     document.getElementById('school-count').innerHTML =
       `Showing <strong>${shown}</strong> of <strong>${total}</strong> schools`;
+  }
+
+  // ===== Stats Toggle =====
+  function setupStatsToggle() {
+    const toggle = document.getElementById('stats-toggle');
+    const summary = document.getElementById('stats-summary');
+    const arrow = document.getElementById('stats-arrow');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      summary.classList.toggle('collapsed');
+      arrow.classList.toggle('collapsed');
+    });
   }
 
   // ===== School Comparison =====

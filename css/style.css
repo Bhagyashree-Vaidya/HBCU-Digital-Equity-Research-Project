@@ -142,6 +142,32 @@ body {
   text-align: right;
 }
 
+/* ===== Stats Toggle ===== */
+.stats-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.stats-toggle span:first-child {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+.stats-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+.stats-arrow.collapsed {
+  transform: rotate(180deg);
+}
+
 /* ===== Stats Summary ===== */
 .stats-summary {
   padding: 16px 20px;
@@ -149,6 +175,14 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.stats-summary.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .stats-summary .stat-card:last-child:nth-child(odd) {
