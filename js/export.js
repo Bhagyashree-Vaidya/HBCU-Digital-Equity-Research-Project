@@ -14,7 +14,7 @@ const HBCUExport = (() => {
     return `
       <div class="fact-sheet" id="fact-sheet-render">
         <h1>HBCU Digital Equity Fact Sheet</h1>
-        <h2>${title} — ${subtitle}</h2>
+        <h2>${title} | ${subtitle}</h2>
         <div class="fs-grid">${cardsHTML}</div>
         <table class="fs-table">${headerRow}${bodyRows}</table>
         <div class="fs-footer">
