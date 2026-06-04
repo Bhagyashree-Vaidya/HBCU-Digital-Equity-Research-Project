@@ -254,5 +254,57 @@ const HBCUCharts = (() => {
     compCharts.push(chart);
   }
 
-  return { renderRadar, renderStateBar, renderComparisonCharts };
+  // ===== School-to-School Comparison Radar =====
+  let compareRadarChart = null;
+  const COMPARE_COLORS = ['#b39ddb', '#42a5f5', '#66bb6a', '#ff7043', '#ef5350', '#fdd835', '#26c6da', '#ec407a'];
+
+  function renderCompareRadar(canvasId, schools) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    if (compareRadarChart) compareRadarChart.destroy();
+
+    const metrics = HBCUData.getMetrics();
+    const labels = Object.keys(metrics).map(k => metrics[k].short);
+
+    const datasets = schools.map((school, i) => {
+      const values = Object.keys(metrics).map(k => HBCUData.normalize(k, school[k]));
+      const color = COMPARE_COLORS[i % COMPARE_COLORS.length];
+      return {
+        label: school.name.split(' ').slice(0, 3).join(' '),
+        data: values,
+        borderColor: color,
+        backgroundColor: color + '15',
+        borderWidth: 2,
+        pointBackgroundColor: color,
+        pointRadius: 3
+      };
+    });
+
+    compareRadarChart = new Chart(ctx, {
+      type: 'radar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#e6edf3', font: { size: 9 }, boxWidth: 10 }
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { display: false, stepSize: 25 },
+            grid: { color: 'rgba(48,54,61,0.5)' },
+            angleLines: { color: 'rgba(48,54,61,0.5)' },
+            pointLabels: { color: '#8b949e', font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  return { renderRadar, renderStateBar, renderComparisonCharts, renderCompareRadar };
 })();

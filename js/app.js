@@ -15,6 +15,7 @@ const App = (() => {
     setupControls();
     setupTabs();
     setupViewToggle();
+    setupCompare();
 
     refresh();
     updateStats(HBCUData.getSchools());
@@ -190,7 +191,7 @@ const App = (() => {
           data-id="${s.id}">
         <div class="school-name">${s.name}</div>
         <div class="school-location">${s.city}, ${s.state}</div>
-        <div class="school-metric" style="color:${m.color}">${m.short}: ${m.format(s[currentMetric])}</div>
+        <div class="school-metric" style="color:${m.color}">${m.short}: ${s[currentMetric] != null ? m.format(s[currentMetric]) : 'N/A'}</div>
       </li>
     `).join('');
 
@@ -302,6 +303,75 @@ const App = (() => {
   function updateSchoolCount(shown, total) {
     document.getElementById('school-count').innerHTML =
       `Showing <strong>${shown}</strong> of <strong>${total}</strong> schools`;
+  }
+
+  // ===== School Comparison =====
+  function setupCompare() {
+    const select = document.getElementById('compare-school-select');
+    if (!select) return;
+
+    // Populate school select
+    const schools = HBCUData.getSchools();
+    schools.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.name} (${s.state})`;
+      select.appendChild(opt);
+    });
+
+    document.getElementById('compare-btn').addEventListener('click', () => {
+      const ids = Array.from(select.selectedOptions).map(o => parseInt(o.value));
+      if (ids.length < 2) {
+        alert('Select at least 2 schools to compare (hold Ctrl/Cmd to multi-select)');
+        return;
+      }
+      if (ids.length > 8) {
+        alert('Select up to 8 schools for a clear comparison');
+        return;
+      }
+      const selected = schools.filter(s => ids.includes(s.id));
+      renderComparison(selected);
+    });
+
+    document.getElementById('compare-clear-btn').addEventListener('click', () => {
+      select.selectedIndex = -1;
+      document.getElementById('compare-results').innerHTML = '';
+      const canvas = document.getElementById('compare-radar-chart');
+      if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    });
+  }
+
+  function renderComparison(schools) {
+    const metrics = HBCUData.getMetrics();
+    const container = document.getElementById('compare-results');
+
+    // Build comparison table
+    const metricKeys = Object.keys(metrics);
+    let html = '<table class="compare-table"><thead><tr><th>Metric</th>';
+    schools.forEach(s => { html += `<th>${s.name.split(' ').slice(0, 3).join(' ')}</th>`; });
+    html += '</tr></thead><tbody>';
+
+    metricKeys.forEach(key => {
+      const m = metrics[key];
+      const values = schools.map(s => s[key]);
+      const best = m.invert
+        ? Math.min(...values.filter(v => v != null))
+        : Math.max(...values.filter(v => v != null));
+
+      html += `<tr><td>${m.short}</td>`;
+      schools.forEach(s => {
+        const v = s[key];
+        const isBest = v === best;
+        const color = isBest ? '#66bb6a' : 'var(--text)';
+        html += `<td style="color:${color};font-weight:${isBest ? '700' : '400'}">${v != null ? m.format(v) : 'N/A'}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    // Render comparison radar
+    HBCUCharts.renderCompareRadar('compare-radar-chart', schools);
   }
 
   // Expose close detail for button

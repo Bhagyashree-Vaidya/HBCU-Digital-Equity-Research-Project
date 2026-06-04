@@ -27,32 +27,37 @@ const HBCUExport = (() => {
 
   function getSchoolRow(s) {
     const m = HBCUData.METRICS;
+    const fmt = (key) => s[key] != null ? m[key].format(s[key]) : 'N/A';
     return {
       name: s.name,
       city: `${s.city}, ${s.state}`,
-      income: m.median_income.format(s.median_income),
-      bachelors: m.pct_bachelors.format(s.pct_bachelors),
-      hs: m.pct_hs_completion.format(s.pct_hs_completion),
-      broadband: m.pct_broadband.format(s.pct_broadband),
-      uninsured: m.pct_uninsured.format(s.pct_uninsured),
-      poverty: m.pct_poverty.format(s.pct_poverty),
-      employment: m.pct_employment.format(s.pct_employment)
+      income: fmt('median_income'),
+      bachelors: fmt('pct_bachelors'),
+      hs: fmt('pct_hs_completion'),
+      broadband: fmt('pct_broadband'),
+      uninsured: fmt('pct_uninsured'),
+      poverty: fmt('pct_poverty'),
+      employment: fmt('pct_employment')
     };
   }
 
   function getSummaryCards(schools) {
     const n = schools.length;
-    const avg = (key) => schools.reduce((s, sc) => s + sc[key], 0) / n;
+    const avg = (key) => {
+      const valid = schools.filter(sc => sc[key] != null);
+      return valid.length ? valid.reduce((s, sc) => s + sc[key], 0) / valid.length : null;
+    };
     const m = HBCUData.METRICS;
+    const fmtAvg = (key) => { const v = avg(key); return v != null ? m[key].format(key === 'median_income' ? Math.round(v) : v) : 'N/A'; };
     return [
       { value: n.toString(), label: 'Schools' },
-      { value: m.median_income.format(Math.round(avg('median_income'))), label: 'Avg Income' },
-      { value: m.pct_bachelors.format(avg('pct_bachelors')), label: "Avg Bachelor's+" },
-      { value: m.pct_broadband.format(avg('pct_broadband')), label: 'Avg Broadband' },
-      { value: m.pct_hs_completion.format(avg('pct_hs_completion')), label: 'Avg HS Completion' },
-      { value: m.pct_uninsured.format(avg('pct_uninsured')), label: 'Avg Uninsured' },
-      { value: m.pct_poverty.format(avg('pct_poverty')), label: 'Avg Poverty' },
-      { value: m.pct_employment.format(avg('pct_employment')), label: 'Avg Employment' }
+      { value: fmtAvg('median_income'), label: 'Avg Income' },
+      { value: fmtAvg('pct_bachelors'), label: "Avg Bachelor's+" },
+      { value: fmtAvg('pct_broadband'), label: 'Avg Broadband' },
+      { value: fmtAvg('pct_hs_completion'), label: 'Avg HS Completion' },
+      { value: fmtAvg('pct_uninsured'), label: 'Avg Uninsured' },
+      { value: fmtAvg('pct_poverty'), label: 'Avg Poverty' },
+      { value: fmtAvg('pct_employment'), label: 'Avg Employment' }
     ];
   }
 

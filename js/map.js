@@ -12,7 +12,7 @@ const HBCUMap = (() => {
     median_income: ['#e53935', '#fb8c00', '#fdd835', '#42a5f5', '#2e7d32'],
     pct_bachelors: ['#e53935', '#fb8c00', '#fdd835', '#42a5f5', '#2e7d32'],
     pct_hs_completion: ['#e53935', '#fb8c00', '#fdd835', '#42a5f5', '#2e7d32'],
-    pct_broadband: ['#e53935', '#ef5350', '#5c9bd4', '#42a5f5', '#1565c0'],
+    pct_broadband: ['#e53935', '#fb8c00', '#fdd835', '#42a5f5', '#1565c0'],
     pct_uninsured: ['#2e7d32', '#42a5f5', '#fdd835', '#fb8c00', '#e53935'],
     pct_poverty: ['#2e7d32', '#42a5f5', '#fdd835', '#fb8c00', '#e53935'],
     pct_employment: ['#e53935', '#fb8c00', '#fdd835', '#42a5f5', '#2e7d32']
@@ -92,21 +92,26 @@ const HBCUMap = (() => {
       const color = getColor(value, metricKey);
 
       const marker = L.circleMarker([school.lat, school.lng], {
-        radius: 8,
+        radius: 5,
         fillColor: color,
         color: '#fff',
-        weight: 2,
+        weight: 1.5,
         opacity: 0.9,
-        fillOpacity: 0.85
+        fillOpacity: 0.9
       });
 
       const popupContent = buildPopup(school);
-      marker.bindPopup(popupContent, { maxWidth: 280 });
+      marker.bindPopup(popupContent, { maxWidth: 280, closeOnClick: false });
 
-      marker.on('click', () => {
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        marker.openPopup();
         showRadius(school);
         if (onSchoolClick) onSchoolClick(school);
       });
+
+      // Bring marker to front on hover for dense areas
+      marker.on('mouseover', () => marker.bringToFront());
 
       marker.schoolData = school;
       markersLayer.addLayer(marker);

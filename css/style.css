@@ -581,6 +581,35 @@ body {
   background: var(--text-muted);
 }
 
+/* ===== Compare Table ===== */
+.compare-panel { padding: 0; }
+.compare-controls { margin-bottom: 12px; }
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+.compare-table th {
+  background: var(--bg-input);
+  color: var(--accent-light);
+  padding: 6px 6px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.compare-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.compare-table tr:hover td { background: var(--bg-input); }
+
 /* ===== Export Button ===== */
 .export-btn {
   padding: 6px 14px;

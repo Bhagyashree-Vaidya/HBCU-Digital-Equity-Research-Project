@@ -7,10 +7,6 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Leaflet MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-
   <!-- Dashboard CSS -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -102,6 +98,7 @@
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="tab-schools">Schools</button>
       <button class="tab-btn" data-tab="tab-detail">Detail</button>
+      <button class="tab-btn" data-tab="tab-compare">Compare</button>
       <button class="tab-btn" data-tab="tab-charts">By State</button>
     </div>
 
@@ -126,6 +123,24 @@
           <div class="radar-container">
             <h4>Profile vs HBCU Average</h4>
             <canvas id="radar-chart" width="300" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compare Schools -->
+      <div class="tab-panel" id="tab-compare">
+        <div class="compare-panel">
+          <div class="compare-controls">
+            <select id="compare-school-select" multiple size="6" style="width:100%;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:12px;">
+            </select>
+            <div style="margin-top:8px;display:flex;gap:6px">
+              <button id="compare-btn" class="export-btn" style="flex:1;font-size:11px;padding:5px 8px;">Compare Selected</button>
+              <button id="compare-clear-btn" style="flex:1;font-size:11px;padding:5px 8px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;cursor:pointer;">Clear</button>
+            </div>
+          </div>
+          <div id="compare-results"></div>
+          <div style="height:300px;margin-top:12px">
+            <canvas id="compare-radar-chart"></canvas>
           </div>
         </div>
       </div>
@@ -200,7 +215,6 @@
 
 <!-- ===== Scripts ===== -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
