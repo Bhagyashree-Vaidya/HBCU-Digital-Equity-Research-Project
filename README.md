@@ -1,6 +1,4 @@
-# HBCU Digital Equity Dashboard
-
-[Project Link](https://hbcu-digital-equity-research-projec.vercel.app/)
+# HBCU Digital Equity Dashboard [Project Link](https://hbcu-digital-equity-research-projec.vercel.app/)
 
 ## What is it?
 
